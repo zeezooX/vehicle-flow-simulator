@@ -18,7 +18,7 @@ function Select() {
         and routing algorithms.
       </Typography>
       <Typography variant="h6">
-        Click on the map to select a 6x4 region.
+        Click on the map to select a 500m x 750m region.
       </Typography>
       <Map onCoordinateSelect={handleCoordinateSelect} />
       {coordinates && (

@@ -19,8 +19,8 @@ const LocationMarker = ({ onCoordinateSelect }) => {
       const latlng = e.latlng;
       setPosition(latlng);
 
-      const latOffset = 0.004;
-      const lngOffset = 0.006;
+      const latOffset = 0.00450;
+      const lngOffset = 0.00675;
       const boxBounds = [
         [latlng.lat - latOffset, latlng.lng - lngOffset],
         [latlng.lat + latOffset, latlng.lng + lngOffset],
@@ -44,7 +44,7 @@ const RegionSelector = ({ onCoordinateSelect }) => {
     <MapContainer
       center={[31.2, 29.9]}
       zoom={13}
-      style={{ height: "450px", width: "100%" }}
+      style={{ height: "70vh", width: "100%" }}
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

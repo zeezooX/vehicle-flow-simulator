@@ -1,24 +1,19 @@
-import logo from './logo.svg';
-import './App.css';
+import Select from "./pages/Select";
+import Simulate from "./pages/Simulate";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+    <Routes>
+      <Route path="/">
+        <Route path="select" element={<Select />} />
+        <Route path="simulate/:lat/:lng" element={<Simulate />} />
+        <Route path="*" element={<Navigate to="/select" />} />
+        <Route index element={<Navigate to="/select" />} />
+      </Route>
+    </Routes>
+  </BrowserRouter>
   );
 }
 

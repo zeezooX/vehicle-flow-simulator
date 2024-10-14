@@ -1,5 +1,5 @@
 import axios from "axios";
-import osmtogeojson from "osmtogeojson";
+import { element } from "prop-types";
 
 const fetchRoads = async (south, west, north, east) => {
   const query = `
@@ -20,8 +20,56 @@ const fetchRoads = async (south, west, north, east) => {
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
-    const geojson = osmtogeojson(response.data);
-    return geojson;
+
+    const nodes = {};
+    let latMin = 90;
+    let lngMin = 180;
+    for (let i = 0; i < response.data.elements.length; i++) {
+      if (response.data.elements[i].type === "node") {
+        let element = response.data.elements[i];
+        if (
+          element.lat >= south &&
+          element.lat <= north &&
+          element.lon >= west &&
+          element.lon <= east
+        ) {
+          nodes[element.id] = {
+            lat: element.lat,
+            lng: element.lon,
+            to: [],
+            from: [],
+          };
+          latMin = Math.min(latMin, element.lat);
+          lngMin = Math.min(lngMin, element.lon);
+        }
+      }
+    }
+    for (let key in nodes) {
+      nodes[key].lat = (nodes[key].lat - latMin) * 100000;
+      nodes[key].lng = (nodes[key].lng - lngMin) * 100000;
+    }
+
+    for (let i = 0; i < response.data.elements.length; i++) {
+      if (response.data.elements[i].type === "way") {
+        let element = response.data.elements[i];
+        let last = null;
+        for (let j = 0; j < element.nodes.length; j++) {
+          let node = {
+            id: element.nodes[j],
+            lanes: element.tags.lanes ? element.tags.lanes : 1,
+          };
+          if (nodes[node.id]) {
+            if (last) {
+              nodes[last.id].to.push(node);
+              nodes[node.id].from.push(last);
+            }
+            last = node;
+          }
+        }
+      }
+    }
+
+    return nodes;
   } catch (error) {
     console.error("Error fetching roads:", error);
     return null;

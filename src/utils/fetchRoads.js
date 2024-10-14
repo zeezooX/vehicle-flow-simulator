@@ -1,5 +1,4 @@
 import axios from "axios";
-import { element } from "prop-types";
 
 const fetchRoads = async (south, west, north, east) => {
   const query = `

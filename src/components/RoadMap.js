@@ -6,10 +6,10 @@ const RoadMap = ({ lat, lng }) => {
 
   useEffect(() => {
     const getRoads = async () => {
-      const south = lat - 0.004;
-      const west = lng - 0.006;
-      const north = lat + 0.004;
-      const east = lng + 0.006;
+      const south = lat - 0.00450;
+      const west = lng - 0.00675;
+      const north = lat + 0.00450;
+      const east = lng + 0.00675;
 
       const data = await fetchRoads(south, west, north, east);
       setRoads(data);

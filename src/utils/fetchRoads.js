@@ -21,40 +21,24 @@ const fetchRoads = async (south, west, north, east) => {
     });
 
     const nodes = {};
-    let latMin = 90;
-    let lngMin = 180;
-    for (let i = 0; i < response.data.elements.length; i++) {
-      if (response.data.elements[i].type === "node") {
-        let element = response.data.elements[i];
-        if (
-          element.lat >= south &&
-          element.lat <= north &&
-          element.lon >= west &&
-          element.lon <= east
-        ) {
-          nodes[element.id] = {
-            lat: element.lat,
-            lng: element.lon,
-            to: [],
-            from: [],
-          };
-          latMin = Math.min(latMin, element.lat);
-          lngMin = Math.min(lngMin, element.lon);
-        }
+    for (const element of response.data.elements) {
+      if (element.type === "node") {
+        nodes[element.id] = {
+          id: element.id,
+          lat: (element.lat - south) / (north - south),
+          lng: (element.lon - west) / (east - west),
+          to: [],
+          from: [],
+        };
       }
     }
-    for (let key in nodes) {
-      nodes[key].lat = (nodes[key].lat - latMin) * 100000;
-      nodes[key].lng = (nodes[key].lng - lngMin) * 100000;
-    }
 
-    for (let i = 0; i < response.data.elements.length; i++) {
-      if (response.data.elements[i].type === "way") {
-        let element = response.data.elements[i];
+    for (const element of response.data.elements) {
+      if (element.type === "way") {
         let last = null;
-        for (let j = 0; j < element.nodes.length; j++) {
+        for (const nodeId of element.nodes) {
           let node = {
-            id: element.nodes[j],
+            id: nodeId,
             lanes: element.tags.lanes ? element.tags.lanes : 1,
           };
           if (nodes[node.id]) {
@@ -64,6 +48,30 @@ const fetchRoads = async (south, west, north, east) => {
             }
             last = node;
           }
+        }
+      }
+    }
+
+    for (const nodeId in nodes) {
+      const node = nodes[nodeId];
+      if (node.lat < 0 || node.lat > 1 || node.lng < 0 || node.lng > 1) {
+        let flag = false;
+        for (const nodeto of node.to) {
+          const other = nodes[nodeto.id];
+          if (other && other.lat >= 0 && other.lat <= 1 && other.lng >= 0 && other.lng <= 1) {
+            flag = true;
+            break;
+          }
+        }
+        for (const nodefrom of node.from) {
+          const other = nodes[nodefrom.id];
+          if (other && other.lat >= 0 && other.lat <= 1 && other.lng >= 0 && other.lng <= 1) {
+            flag = true;
+            break;
+          }
+        }
+        if (!flag) {
+          delete nodes[nodeId];
         }
       }
     }

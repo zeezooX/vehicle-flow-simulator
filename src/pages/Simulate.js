@@ -6,7 +6,7 @@ function Simulate() {
   const { lat, lng } = useParams();
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} alignItems="center">
       <Button variant="contained" href="/select">
         Reselect Region
       </Button>
